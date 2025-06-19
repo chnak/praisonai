@@ -30,7 +30,7 @@ npm run build
 
 Here are examples of different ways to use PraisonAI:
 
-```javescript
+```javascript
 require('dotenv').config()
 const { Agent,PraisonAIAgents,MCP } = require('praisonai');
 console.log(require('praisonai'))
