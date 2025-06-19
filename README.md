@@ -30,6 +30,85 @@ npm run build
 
 Here are examples of different ways to use PraisonAI:
 
+```javescript
+require('dotenv').config()
+const { Agent,PraisonAIAgents,MCP } = require('praisonai');
+console.log(require('praisonai'))
+const getTime = {
+  type: "function",
+  function: {
+    name: "get_time",
+    description: "Get current time for a given location.",
+    parameters: {
+      type: "object",
+      properties: {
+        location: {
+          type: "string",
+          description: "City and country e.g. Bogotá, Colombia"
+        }
+      },
+      required: ["location"],
+      additionalProperties: false
+    },
+    strict: true
+  }
+};
+
+global.get_time = async function(location) {
+    console.log(`Getting time for ${location}...`);
+    const now = new Date();
+    return `${now.getHours()}:${now.getMinutes()}`;
+};
+
+const toolFunctions={}
+async function main(){
+	const mcp = new MCP('http://127.0.0.1:1337/sse');
+	// Create a simple science explainer agent
+	await mcp.initialize();
+	 for (const tool of mcp) {
+		const paramNames = Object.keys(tool.schemaProperties || {});
+		toolFunctions[tool.name] = async (...args) => {
+			const params = {};
+			if (args.length === 1 && typeof args[0] === 'object' && args[0] !== null) {
+				// If single object argument, use it directly as params
+				Object.assign(params, args[0]);
+			} else {
+				// Map positional arguments with validation
+				if (args.length > paramNames.length) {
+				  console.warn(
+					`Tool ${tool.name}: Too many arguments provided. Expected ${paramNames.length}, got ${args.length}`
+				  );
+				}
+				for (let i = 0; i < Math.min(args.length, paramNames.length); i++) {
+				  params[paramNames[i]] = args[i];
+				}
+			}
+			return tool.execute(params);
+		}
+	 }
+	console.log(toolFunctions)
+	const agent = new Agent({
+	  instructions: "您是智能助手",
+	  name: "ScienceExplainer",
+	  llm:"deepseek-chat",
+	  verbose: true,
+	  tools: mcp.toOpenAITools(),
+	  toolFunctions
+	});
+
+	// Ask a question
+	agent.start("今天深圳的天气情况")
+	  .then(response => {
+		console.log('\nExplanation:');
+		console.log(response);
+	  })
+	  .catch(error => console.error('Error:', error));
+}
+
+main()
+
+```
+
 ### 1. Single Agent Example
 
 ```typescript
