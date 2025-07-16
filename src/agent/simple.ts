@@ -212,7 +212,7 @@ export class Agent {
         results.push({
           role: 'tool',
           tool_call_id: id,
-          content: result.toString()
+          content: JSON.stringify(result)
         });
         
         await Logger.debug(`Tool call result for ${name}:`, { result });
