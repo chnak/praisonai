@@ -206,7 +206,7 @@ export class Agent {
         }
         
         // Call the function
-        const result = await this.toolFunctions[name](...Object.values(args));
+        const result = await this.toolFunctions[name](args);
         
         // Add result to messages
         results.push({
