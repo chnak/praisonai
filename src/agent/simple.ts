@@ -263,7 +263,7 @@ export class Agent {
         // Use tools (non-streaming for now to simplify implementation)
         let continueConversation = true;
         let iterations = 0;
-        const maxIterations = 5; // Prevent infinite loops
+        const maxIterations = 100; // Prevent infinite loops
         
         while (continueConversation && iterations < maxIterations) {
           iterations++;
